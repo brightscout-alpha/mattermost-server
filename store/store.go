@@ -360,18 +360,19 @@ type UserStore interface {
 	AnalyticsGetGuestCount() (int64, error)
 	GetProfilesNotInTeam(teamId string, groupConstrained bool, offset int, limit int, viewRestrictions *model.ViewUsersRestrictions) ([]*model.User, error)
 	GetEtagForProfilesNotInTeam(teamId string) string
-	ClearAllCustomRoleAssignments() error
-	InferSystemInstallDate() (int64, error)
-	GetAllAfter(limit int, afterId string) ([]*model.User, error)
-	GetUsersBatchForIndexing(startTime, endTime int64, limit int) ([]*model.UserForIndexing, error)
-	Count(options model.UserCountOptions) (int64, error)
-	GetTeamGroupUsers(teamID string) ([]*model.User, error)
-	GetChannelGroupUsers(channelID string) ([]*model.User, error)
-	PromoteGuestToUser(userID string) error
-	DemoteUserToGuest(userID string) error
-	DeactivateGuests() ([]string, error)
-	AutocompleteUsersInChannel(teamId, channelId, term string, options *model.UserSearchOptions) (*model.UserAutocompleteInChannel, error)
-	GetKnownUsers(userID string) ([]string, error)
+	ClearAllCustomRoleAssignments() *model.AppError
+	InferSystemInstallDate() (int64, *model.AppError)
+	GetAllAfter(limit int, afterId string) ([]*model.User, *model.AppError)
+	GetUsersBatchForIndexing(startTime, endTime int64, limit int) ([]*model.UserForIndexing, *model.AppError)
+	Count(options model.UserCountOptions) (int64, *model.AppError)
+	GetTeamGroupUsers(teamID string) ([]*model.User, *model.AppError)
+	GetChannelGroupUsers(channelID string) ([]*model.User, *model.AppError)
+	PromoteGuestToUser(userID string) *model.AppError
+	DemoteUserToGuest(userID string) *model.AppError
+	DeactivateGuests() ([]string, *model.AppError)
+	AutocompleteUsersInChannel(teamId, channelId, term string, options *model.UserSearchOptions) (*model.UserAutocompleteInChannel, *model.AppError)
+	GetKnownUsers(userID string) ([]string, *model.AppError)
+	GetTimezone(userId string) (model.StringMap, *model.AppError)
 }
 
 type BotStore interface {

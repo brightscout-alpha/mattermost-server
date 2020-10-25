@@ -319,16 +319,14 @@ func (a *App) SetStatusDoNotDisturbTimed(userId string, endtime string) {
 	status.Status = model.STATUS_DND
 	status.Manual = true
 
-	u, aErr := a.Srv().Store.User().Get(userId)
+	tz, aErr := a.Srv().Store.User().GetTimezone(status.UserId)
 	if aErr != nil {
 		mlog.Error("Failed to fetch user", mlog.String("user_id", userId), mlog.String("err", aErr.Error()))
 	}
 
-	utc, cErr := convertToUTC(u.Timezone, endtime)
-
+	utc, cErr := convertToUTC(tz, endtime)
 	if cErr != nil {
 		mlog.Error("Failed to conver user timezone to utc", mlog.String("user_id", userId), mlog.String("err", cErr.Error()))
-		return
 	}
 
 	status.DNDEndTime = utc.Unix()
@@ -425,6 +423,7 @@ func (a *App) UpdateDNDStatusOfUsers() {
 	statuses, err := a.Srv().Store.Status().GetExpiredDNDStatuses()
 	if err != nil {
 		mlog.Error("Failed to fetch dnd statues from store", mlog.String("err", err.Error()))
+		return
 	}
 	for i := range statuses {
 		if statuses[i].Status != model.STATUS_DND {

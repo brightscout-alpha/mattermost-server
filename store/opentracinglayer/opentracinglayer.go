@@ -8757,7 +8757,25 @@ func (s *OpenTracingLayerUserStore) GetTeamGroupUsers(teamID string) ([]*model.U
 	return result, err
 }
 
-func (s *OpenTracingLayerUserStore) GetUnreadCount(userId string) (int64, error) {
+func (s *OpenTracingLayerUserStore) GetTimezone(userId string) (model.StringMap, *model.AppError) {
+	origCtx := s.Root.Store.Context()
+	span, newCtx := tracing.StartSpanWithParentByContext(s.Root.Store.Context(), "UserStore.GetTimezone")
+	s.Root.Store.SetContext(newCtx)
+	defer func() {
+		s.Root.Store.SetContext(origCtx)
+	}()
+
+	defer span.Finish()
+	result, err := s.UserStore.GetTimezone(userId)
+	if err != nil {
+		span.LogFields(spanlog.Error(err))
+		ext.Error.Set(span, true)
+	}
+
+	return result, err
+}
+
+func (s *OpenTracingLayerUserStore) GetUnreadCount(userId string) (int64, *model.AppError) {
 	origCtx := s.Root.Store.Context()
 	span, newCtx := tracing.StartSpanWithParentByContext(s.Root.Store.Context(), "UserStore.GetUnreadCount")
 	s.Root.Store.SetContext(newCtx)

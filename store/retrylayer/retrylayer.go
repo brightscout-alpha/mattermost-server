@@ -8872,7 +8872,13 @@ func (s *RetryLayerUserStore) GetTeamGroupUsers(teamID string) ([]*model.User, e
 
 }
 
-func (s *RetryLayerUserStore) GetUnreadCount(userId string) (int64, error) {
+func (s *RetryLayerUserStore) GetTimezone(userId string) (model.StringMap, *model.AppError) {
+
+	return s.UserStore.GetTimezone(userId)
+
+}
+
+func (s *RetryLayerUserStore) GetUnreadCount(userId string) (int64, *model.AppError) {
 
 	tries := 0
 	for {

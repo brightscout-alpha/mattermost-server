@@ -7910,7 +7910,23 @@ func (s *TimerLayerUserStore) GetTeamGroupUsers(teamID string) ([]*model.User, e
 	return result, err
 }
 
-func (s *TimerLayerUserStore) GetUnreadCount(userId string) (int64, error) {
+func (s *TimerLayerUserStore) GetTimezone(userId string) (model.StringMap, *model.AppError) {
+	start := timemodule.Now()
+
+	result, err := s.UserStore.GetTimezone(userId)
+
+	elapsed := float64(timemodule.Since(start)) / float64(timemodule.Second)
+	if s.Root.Metrics != nil {
+		success := "false"
+		if err == nil {
+			success = "true"
+		}
+		s.Root.Metrics.ObserveStoreMethodDuration("UserStore.GetTimezone", success, elapsed)
+	}
+	return result, err
+}
+
+func (s *TimerLayerUserStore) GetUnreadCount(userId string) (int64, *model.AppError) {
 	start := timemodule.Now()
 
 	result, err := s.UserStore.GetUnreadCount(userId)
