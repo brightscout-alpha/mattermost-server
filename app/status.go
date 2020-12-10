@@ -432,3 +432,16 @@ func (a *App) SetStatusCustomMessage(userId string, message string, endtime stri
 
 	a.SaveAndBroadcastStatus(status)
 }
+
+// UpdateCustomStatusOfUsers is a recurring task which is started when server starts
+// which unsets custom status of users if needed and saves and broadcasts it
+func (a *App) UpdateCustomStatusOfUsers() {
+	statuses, err := a.UpdateExpiredCustomStatuses()
+	if err != nil {
+		mlog.Error("Failed to update statuses in store", mlog.String("err", err.Error()))
+	}
+	for i := range statuses {
+		a.AddStatusCache(statuses[i])
+		a.BroadcastStatus(statuses[i])
+	}
+}

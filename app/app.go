@@ -101,6 +101,7 @@ func (a *App) InitServer() {
 		a.srv.RunJobs()
 		if a.IsLeader() {
 			model.CreateRecurringTask("Unset DND Statuses", a.UpdateDNDStatusOfUsers, time.Duration(300)*time.Second)
+			model.CreateRecurringTask("Unset Custom Statuses", a.UpdateCustomStatusOfUsers, time.Duration(300)*time.Second)
 		}
 	})
 }
@@ -710,4 +711,8 @@ func (a *App) dbHealthCheckKey() string {
 
 func (a *App) UpdateExpiredDNDStatuses() ([]*model.Status, error) {
 	return a.Srv().Store.Status().UpdateExpiredDNDStatuses()
+}
+
+func (a *App) UpdateExpiredCustomStatuses() ([]*model.Status, error) {
+	return a.Srv().Store.Status().UpdateExpiredCustomStatuses()
 }

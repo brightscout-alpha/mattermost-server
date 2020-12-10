@@ -559,6 +559,7 @@ type StatusStore interface {
 	GetTotalActiveUsersCount() (int64, error)
 	UpdateLastActivityAt(userId string, lastActivityAt int64) error
 	UpdateExpiredDNDStatuses() ([]*model.Status, error)
+	UpdateExpiredCustomStatuses() ([]*model.Status, error)
 }
 
 type FileInfoStore interface {

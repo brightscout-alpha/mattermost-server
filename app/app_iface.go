@@ -321,6 +321,9 @@ type AppIface interface {
 	UpdateChannel(channel *model.Channel) (*model.Channel, *model.AppError)
 	// UpdateChannelScheme saves the new SchemeId of the channel passed.
 	UpdateChannelScheme(channel *model.Channel) (*model.Channel, *model.AppError)
+	// UpdateCustomStatusOfUsers is a recurring task which is started when server starts
+	// which unsets custom status of users if needed and saves and broadcasts it
+	UpdateCustomStatusOfUsers()
 	// UpdateDNDStatusOfUsers is a recurring task which is started when server starts
 	// which unsets dnd status of users if needed and saves and broadcasts it
 	UpdateDNDStatusOfUsers()
@@ -981,6 +984,7 @@ type AppIface interface {
 	UpdateCommand(oldCmd, updatedCmd *model.Command) (*model.Command, *model.AppError)
 	UpdateConfig(f func(*model.Config))
 	UpdateEphemeralPost(userId string, post *model.Post) *model.Post
+	UpdateExpiredCustomStatuses() ([]*model.Status, error)
 	UpdateExpiredDNDStatuses() ([]*model.Status, error)
 	UpdateGroup(group *model.Group) (*model.Group, *model.AppError)
 	UpdateGroupSyncable(groupSyncable *model.GroupSyncable) (*model.GroupSyncable, *model.AppError)

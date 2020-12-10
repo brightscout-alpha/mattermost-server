@@ -133,6 +133,38 @@ func (s SqlStatusStore) UpdateExpiredDNDStatuses() ([]*model.Status, error) {
 	return statuses, nil
 }
 
+func (s SqlStatusStore) UpdateExpiredCustomStatuses() ([]*model.Status, error) {
+	queryString := fmt.Sprintf(`
+		UPDATE
+			Status
+		SET
+			StatusClearTimeUnix = %v, Manual = %v,
+			Message = %v,
+		WHERE
+			(Message IS NOT NULL AND StatusClearTimeUnix <= %v AND StatusClearTimeUnix > %v)
+		RETURNING
+			UserId, Status`,
+		-1, false, "", time.Now().UTC().Unix(), 1,
+	)
+	rows, err := s.GetMaster().Query(queryString)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to find Statuses")
+	}
+	var statuses []*model.Status
+	defer rows.Close()
+	for rows.Next() {
+		var status model.Status
+		if err = rows.Scan(&status.UserId, &status.Status); err != nil {
+			return nil, errors.Wrap(err, "unable to scan from rows")
+		}
+		statuses = append(statuses, &status)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "failed while iterating over rows")
+	}
+	return statuses, nil
+}
+
 func (s SqlStatusStore) ResetAll() error {
 	if _, err := s.GetMaster().Exec("UPDATE Status SET Status = :Status WHERE Manual = false", map[string]interface{}{"Status": model.STATUS_OFFLINE}); err != nil {
 		return errors.Wrap(err, "failed to update Statuses")

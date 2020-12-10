@@ -14715,6 +14715,21 @@ func (a *OpenTracingAppLayer) UpdateConfig(f func(*model.Config)) {
 	a.app.UpdateConfig(f)
 }
 
+func (a *OpenTracingAppLayer) UpdateCustomStatusOfUsers() {
+	origCtx := a.ctx
+	span, newCtx := tracing.StartSpanWithParentByContext(a.ctx, "app.UpdateCustomStatusOfUsers")
+
+	a.ctx = newCtx
+	a.app.Srv().Store.SetContext(newCtx)
+	defer func() {
+		a.app.Srv().Store.SetContext(origCtx)
+		a.ctx = origCtx
+	}()
+
+	defer span.Finish()
+	a.app.UpdateCustomStatusOfUsers()
+}
+
 func (a *OpenTracingAppLayer) UpdateDNDStatusOfUsers() {
 	origCtx := a.ctx
 	span, newCtx := tracing.StartSpanWithParentByContext(a.ctx, "app.UpdateDNDStatusOfUsers")
@@ -14745,6 +14760,28 @@ func (a *OpenTracingAppLayer) UpdateEphemeralPost(userId string, post *model.Pos
 	resultVar0 := a.app.UpdateEphemeralPost(userId, post)
 
 	return resultVar0
+}
+
+func (a *OpenTracingAppLayer) UpdateExpiredCustomStatuses() ([]*model.Status, error) {
+	origCtx := a.ctx
+	span, newCtx := tracing.StartSpanWithParentByContext(a.ctx, "app.UpdateExpiredCustomStatuses")
+
+	a.ctx = newCtx
+	a.app.Srv().Store.SetContext(newCtx)
+	defer func() {
+		a.app.Srv().Store.SetContext(origCtx)
+		a.ctx = origCtx
+	}()
+
+	defer span.Finish()
+	resultVar0, resultVar1 := a.app.UpdateExpiredCustomStatuses()
+
+	if resultVar1 != nil {
+		span.LogFields(spanlog.Error(resultVar1))
+		ext.Error.Set(span, true)
+	}
+
+	return resultVar0, resultVar1
 }
 
 func (a *OpenTracingAppLayer) UpdateExpiredDNDStatuses() ([]*model.Status, error) {
