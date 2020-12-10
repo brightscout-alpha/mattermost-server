@@ -938,6 +938,7 @@ type AppIface interface {
 	SetServer(srv *Server)
 	SetSession(s *model.Session)
 	SetStatusAwayIfNeeded(userId string, manual bool)
+	SetStatusCustomMessage(userId string, message string, endtime string)
 	SetStatusDoNotDisturb(userId string)
 	SetStatusOffline(userId string, manual bool)
 	SetStatusOnline(userId string, manual bool)

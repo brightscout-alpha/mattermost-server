@@ -13789,6 +13789,21 @@ func (a *OpenTracingAppLayer) SetStatusAwayIfNeeded(userId string, manual bool) 
 	a.app.SetStatusAwayIfNeeded(userId, manual)
 }
 
+func (a *OpenTracingAppLayer) SetStatusCustomMessage(userId string, message string, endtime string) {
+	origCtx := a.ctx
+	span, newCtx := tracing.StartSpanWithParentByContext(a.ctx, "app.SetStatusCustomMessage")
+
+	a.ctx = newCtx
+	a.app.Srv().Store.SetContext(newCtx)
+	defer func() {
+		a.app.Srv().Store.SetContext(origCtx)
+		a.ctx = origCtx
+	}()
+
+	defer span.Finish()
+	a.app.SetStatusCustomMessage(userId, message, endtime)
+}
+
 func (a *OpenTracingAppLayer) SetStatusDoNotDisturb(userId string) {
 	origCtx := a.ctx
 	span, newCtx := tracing.StartSpanWithParentByContext(a.ctx, "app.SetStatusDoNotDisturb")

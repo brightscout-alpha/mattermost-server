@@ -407,3 +407,28 @@ func (a *App) UpdateDNDStatusOfUsers() {
 		a.BroadcastStatus(statuses[i])
 	}
 }
+
+func (a *App) SetStatusCustomMessage(userId string, message string, endtime string) {
+	// if !*a.Config().ServiceSettings.EnableCustomUserStatuses {
+	// 	return
+	// }
+
+	// take a string in RFC3339 format and return time
+	utc, cErr := time.Parse(time.RFC3339, endtime)
+
+	if cErr != nil {
+		mlog.Error("Failed to parse endtime", mlog.String("user_id", userId), mlog.String("err", cErr.Error()))
+		return
+	}
+
+	status, err := a.GetStatus(userId)
+
+	if err != nil {
+		status = &model.Status{UserId: userId, Status: model.STATUS_OFFLINE, Manual: false, LastActivityAt: 0, ActiveChannel: ""}
+	}
+
+	status.Message = message
+	status.StatusClearTimeUnix = utc.Unix()
+
+	a.SaveAndBroadcastStatus(status)
+}

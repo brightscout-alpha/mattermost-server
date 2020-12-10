@@ -100,6 +100,8 @@ func updateUserStatus(c *Context, w http.ResponseWriter, r *http.Request) {
 		c.App.SetStatusAwayIfNeeded(c.Params.UserId, true)
 	case "dnd":
 		c.App.SetStatusDoNotDisturbTimed(c.Params.UserId, status.StatusClearTime)
+	case "custom_message":
+		c.App.SetStatusCustomMessage(c.Params.UserId, status.Message, status.StatusClearTime)
 	default:
 		c.SetInvalidParam("status")
 		return
