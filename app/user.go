@@ -1126,7 +1126,7 @@ func (a *App) UpdateActive(user *model.User, active bool) (*model.User, *model.A
 	a.invalidateUserChannelMembersCaches(user.Id)
 	a.InvalidateCacheForUser(user.Id)
 
-	a.sendUpdatedUserEvent(*ruser)
+	a.SendUpdatedUserEvent(*ruser)
 
 	return ruser, nil
 }
@@ -1174,7 +1174,7 @@ func (a *App) UpdateUserAsUser(user *model.User, asAdmin bool) (*model.User, *mo
 		return nil, err
 	}
 
-	a.sendUpdatedUserEvent(*updatedUser)
+	a.SendUpdatedUserEvent(*updatedUser)
 
 	return updatedUser, nil
 }
@@ -1192,7 +1192,7 @@ func (a *App) PatchUser(userId string, patch *model.UserPatch, asAdmin bool) (*m
 		return nil, err
 	}
 
-	a.sendUpdatedUserEvent(*updatedUser)
+	a.SendUpdatedUserEvent(*updatedUser)
 
 	return updatedUser, nil
 }
@@ -1227,7 +1227,7 @@ func (a *App) UpdateUserAuth(userId string, userAuth *model.UserAuth) (*model.Us
 	return userAuth, nil
 }
 
-func (a *App) sendUpdatedUserEvent(user model.User) {
+func (a *App) SendUpdatedUserEvent(user model.User) {
 	adminCopyOfUser := user.DeepCopy()
 	a.SanitizeProfile(adminCopyOfUser, true)
 	adminMessage := model.NewWebSocketEvent(model.WEBSOCKET_EVENT_USER_UPDATED, "", "", "", nil)
@@ -1849,7 +1849,7 @@ func (a *App) VerifyUserEmail(userId, email string) *model.AppError {
 		return err
 	}
 
-	a.sendUpdatedUserEvent(*user)
+	a.SendUpdatedUserEvent(*user)
 
 	return nil
 }
@@ -2215,7 +2215,7 @@ func (a *App) PromoteGuestToUser(user *model.User, requestorId string) *model.Ap
 	if err != nil {
 		mlog.Error("Failed to get user on promote guest to user", mlog.Err(err))
 	} else {
-		a.sendUpdatedUserEvent(*promotedUser)
+		a.SendUpdatedUserEvent(*promotedUser)
 		a.UpdateSessionsIsGuest(promotedUser.Id, promotedUser.IsGuest())
 	}
 
@@ -2258,7 +2258,7 @@ func (a *App) DemoteUserToGuest(user *model.User) *model.AppError {
 	if err != nil {
 		mlog.Error("Failed to get user on demote user to guest", mlog.Err(err))
 	} else {
-		a.sendUpdatedUserEvent(*demotedUser)
+		a.SendUpdatedUserEvent(*demotedUser)
 		a.UpdateSessionsIsGuest(demotedUser.Id, demotedUser.IsGuest())
 	}
 
