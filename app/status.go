@@ -375,7 +375,7 @@ func (a *App) SetCustomStatus(userID string, cs *model.CustomStatus) *model.AppE
 	if updateErr != nil {
 		return err
 	}
-	a.SendUpdatedUserEvent(*user)
+	a.sendUpdatedUserEvent(*user)
 
 	return nil
 }
@@ -391,7 +391,7 @@ func (a *App) RemoveCustomStatus(userID string) *model.AppError {
 	if updateErr != nil {
 		return err
 	}
-	a.SendUpdatedUserEvent(*user)
+	a.sendUpdatedUserEvent(*user)
 
 	return nil
 }
@@ -407,7 +407,7 @@ func (a *App) RemoveRecentCustomStatus(userID string, status *model.CustomStatus
 	if updateErr != nil {
 		return err
 	}
-	a.SendUpdatedUserEvent(*user)
+	a.sendUpdatedUserEvent(*user)
 
 	return nil
 }

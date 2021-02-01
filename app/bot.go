@@ -189,7 +189,7 @@ func (a *App) PatchBot(botUserId string, botPatch *model.BotPatch) (*model.Bot, 
 	a.InvalidateCacheForUser(user.Id)
 
 	ruser := userUpdate.New
-	a.SendUpdatedUserEvent(*ruser)
+	a.sendUpdatedUserEvent(*ruser)
 
 	bot, nErr = a.Srv().Store.Bot().Update(bot)
 	if nErr != nil {
