@@ -701,7 +701,7 @@
   },
   {
     "id": "api.command_custom_status.desc",
-    "translation": "Set or Clear your status"
+    "translation": "Set or clear your status"
   },
   {
     "id": "api.command_custom_status.hint",
