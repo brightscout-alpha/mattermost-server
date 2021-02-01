@@ -20,7 +20,7 @@ const (
 	CMD_CUSTOM_STATUS = "status"
 	CMD_CUSTOM_STATUS_CLEAR = "clear"
 
-	DEFAULT_CUSTOM_STATUS_EMOJI = ":speech_balloon:"
+	DEFAULT_CUSTOM_STATUS_EMOJI = "speech_balloon"
 )
 
 func init() {
@@ -43,19 +43,10 @@ func (*CustomStatusProvider) GetCommand(a *app.App, T goi18n.TranslateFunc) *mod
 
 func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, message string) *model.CommandResponse {
 	if message == CMD_CUSTOM_STATUS_CLEAR {
-		user, gErr := a.GetUser(args.UserId)
-		if gErr != nil {
-			mlog.Error(gErr.Error())
+		if err := a.RemoveCustomStatus(args.UserId); err != nil {
+			mlog.Error(err.Error())
 			return &model.CommandResponse{Text: args.T("api.command_custom_status.clear.app_error"), ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL}
 		}
-
-		user.ClearCustomStatus()
-		_, uErr := a.UpdateUser(user, false)
-		if uErr != nil {
-			mlog.Error(uErr.Error())
-			return &model.CommandResponse{Text: args.T("api.command_custom_status.clear.app_error"), ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL}
-		}
-		a.SendUpdatedUserEvent(*user)
 
 		return &model.CommandResponse{
 			ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
@@ -63,7 +54,7 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 		}
 	}
 
-	customStatus := model.CustomStatus{
+	customStatus := &model.CustomStatus{
 		Emoji: DEFAULT_CUSTOM_STATUS_EMOJI,
 		Text:  message,
 	}
@@ -74,19 +65,10 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 		customStatus.Text = strings.TrimSpace(message[firstEmojiLocations[1]:])
 	}
 
-	user, gErr := a.GetUser(args.UserId)
-	if gErr != nil {
-		mlog.Error(gErr.Error())
+	if err := a.SetCustomStatus(args.UserId, customStatus); err != nil {
+		mlog.Error(err.Error())
 		return &model.CommandResponse{Text: args.T("api.command_custom_status.app_error"), ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL}
 	}
-
-	user.SetCustomStatus(&customStatus)
-	_, uErr := a.UpdateUser(user, false)
-	if uErr != nil {
-		mlog.Error(uErr.Error())
-		return &model.CommandResponse{Text: args.T("api.command_custom_status.app_error"), ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL}
-	}
-	a.SendUpdatedUserEvent(*user)
 
 	return &model.CommandResponse{
 		ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
