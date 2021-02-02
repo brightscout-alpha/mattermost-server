@@ -17,7 +17,7 @@ type CustomStatusProvider struct {
 }
 
 const (
-	CMD_CUSTOM_STATUS = "status"
+	CMD_CUSTOM_STATUS       = "status"
 	CMD_CUSTOM_STATUS_CLEAR = "clear"
 
 	DEFAULT_CUSTOM_STATUS_EMOJI = "speech_balloon"
@@ -61,7 +61,7 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 	firstEmojiLocations := model.EMOJI_PATTERN.FindIndex([]byte(message))
 	if len(firstEmojiLocations) > 0 && firstEmojiLocations[0] == 0 {
 		// emoji found at starting index
-		customStatus.Emoji = message[firstEmojiLocations[0]+1:firstEmojiLocations[1]-1]
+		customStatus.Emoji = message[firstEmojiLocations[0]+1 : firstEmojiLocations[1]-1]
 		customStatus.Text = strings.TrimSpace(message[firstEmojiLocations[1]:])
 	}
 
@@ -73,8 +73,8 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 
 	return &model.CommandResponse{
 		ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL,
-		Text:         args.T("api.command_custom_status.success", map[string]interface{}{
-			"EmojiName":     ":"+customStatus.Emoji+":",
+		Text: args.T("api.command_custom_status.success", map[string]interface{}{
+			"EmojiName":     ":" + customStatus.Emoji + ":",
 			"StatusMessage": customStatus.Text,
 		}),
 	}
