@@ -17,8 +17,8 @@ type CustomStatusProvider struct {
 }
 
 const (
-	CMDCustomStatus      = "status"
-	CMDCustomStatusClear = "clear"
+	CmdCustomStatus      = "status"
+	CmdCustomStatusClear = "clear"
 
 	DefaultCustomStatusEmoji = "speech_balloon"
 )
@@ -28,12 +28,12 @@ func init() {
 }
 
 func (*CustomStatusProvider) GetTrigger() string {
-	return CMDCustomStatus
+	return CmdCustomStatus
 }
 
 func (*CustomStatusProvider) GetCommand(a *app.App, T goi18n.TranslateFunc) *model.Command {
 	return &model.Command{
-		Trigger:          CMDCustomStatus,
+		Trigger:          CmdCustomStatus,
 		AutoComplete:     true,
 		AutoCompleteDesc: T("api.command_custom_status.desc"),
 		AutoCompleteHint: T("api.command_custom_status.hint"),
@@ -42,7 +42,7 @@ func (*CustomStatusProvider) GetCommand(a *app.App, T goi18n.TranslateFunc) *mod
 }
 
 func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, message string) *model.CommandResponse {
-	if message == CMDCustomStatusClear {
+	if message == CmdCustomStatusClear {
 		if err := a.RemoveCustomStatus(args.UserId); err != nil {
 			mlog.Error(err.Error())
 			return &model.CommandResponse{Text: args.T("api.command_custom_status.clear.app_error"), ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL}
