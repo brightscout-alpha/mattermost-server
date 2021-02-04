@@ -21,6 +21,10 @@ import (
 	"github.com/mattermost/mattermost-server/v5/utils"
 )
 
+const (
+	CmdCustomStatusTrigger = "status"
+)
+
 type CommandProvider interface {
 	GetTrigger() string
 	GetCommand(a *App, T goi18n.TranslateFunc) *model.Command
@@ -78,6 +82,10 @@ func (a *App) CreateCommandPost(post *model.Post, teamId string, response *model
 func (a *App) ListAutocompleteCommands(teamId string, T goi18n.TranslateFunc) ([]*model.Command, *model.AppError) {
 	commands := make([]*model.Command, 0, 32)
 	seen := make(map[string]bool)
+
+	if !*a.Config().TeamSettings.EnableCustomUserStatuses {
+		seen[CmdCustomStatusTrigger] = true
+	}
 
 	for _, cmd := range a.PluginCommandsForTeam(teamId) {
 		if cmd.AutoComplete && !seen[cmd.Trigger] {
