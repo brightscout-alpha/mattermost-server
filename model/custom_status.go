@@ -12,7 +12,7 @@ const (
 	UserPropsKeyCustomStatus         = "customStatus"
 	UserPropsKeyRecentCustomStatuses = "recentCustomStatuses"
 
-	CustomStatusTextMaxRunes = 250
+	CustomStatusTextMaxRunes = 100
 	MaxRecentCustomStatuses  = 5
 )
 
