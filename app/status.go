@@ -434,6 +434,10 @@ func (a *App) RemoveRecentCustomStatus(userID string, status *model.CustomStatus
 	}
 
 	existingRCS := model.RecentCustomStatusesFromJson(strings.NewReader(pref.Value))
+	if !existingRCS.Contains(status) {
+		return model.NewAppError("RemoveRecentCustomStatus", "api.custom_status.recent_custom_statuses.delete.app_error", nil, "", http.StatusBadRequest)
+	}
+
 	newRCS := existingRCS.Remove(status)
 	pref.Value = newRCS.ToJson()
 
