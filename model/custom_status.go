@@ -55,11 +55,7 @@ func (cs *CustomStatus) IsDurationValid() bool {
 }
 
 func (cs *CustomStatus) IsExpirationTimeValid() bool {
-	if cs.Duration != DontClear && cs.ExpiresAt.IsZero() {
-		return false
-	}
-
-	if cs.ExpiresAt.Before(time.Now()) {
+	if cs.Duration != DontClear && (cs.ExpiresAt.IsZero() || cs.ExpiresAt.Before(time.Now())) {
 		return false
 	}
 
