@@ -9,26 +9,27 @@ import (
 	"time"
 )
 
-type Duration string
-
 const (
 	UserPropsKeyCustomStatus = "customStatus"
 
-	CustomStatusTextMaxRunes          = 100
-	MaxRecentCustomStatuses           = 5
-	DontClear                Duration = "dont_clear"
-	ThirtyMinutes                     = "thirty_minutes"
-	OneHour                           = "one_hour"
-	FourHours                         = "four_hours"
-	Today                             = "today"
-	ThisWeek                          = "this_week"
-	CustomDateTime                    = "date_and_time"
+	CustomStatusTextMaxRunes = 100
+	MaxRecentCustomStatuses  = 5
 )
+
+var ValidCustomStatusDuration = map[string]bool{
+	"dont_clear":     true,
+	"thirty_minutes": true,
+	"one_hour":       true,
+	"four_hours":     true,
+	"today":          true,
+	"this_week":      true,
+	"date_and_time":  true,
+}
 
 type CustomStatus struct {
 	Emoji     string    `json:"emoji"`
 	Text      string    `json:"text"`
-	Duration  Duration  `json:"duration"`
+	Duration  string    `json:"duration"`
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
@@ -46,20 +47,11 @@ func (cs *CustomStatus) ToJson() string {
 }
 
 func (cs *CustomStatus) IsDurationValid() bool {
-	switch cs.Duration {
-	case DontClear, ThirtyMinutes, OneHour, FourHours, Today, ThisWeek, CustomDateTime:
-		return true
-	}
-
-	return false
+	return ValidCustomStatusDuration[cs.Duration]
 }
 
 func (cs *CustomStatus) IsExpirationTimeValid() bool {
-	if cs.Duration != DontClear && (cs.ExpiresAt.IsZero() || cs.ExpiresAt.Before(time.Now())) {
-		return false
-	}
-
-	return true
+	return !(cs.Duration != "dont_clear" && (cs.ExpiresAt.IsZero() || cs.ExpiresAt.Before(time.Now())))
 }
 
 func CustomStatusFromJson(data io.Reader) *CustomStatus {
