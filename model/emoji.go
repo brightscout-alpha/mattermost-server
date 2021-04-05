@@ -15,6 +15,7 @@ const (
 	EMOJI_SORT_BY_NAME    = "name"
 )
 
+var SystemEmojisByFilename map[string]string = createReverseMapOfSystemEmoji()
 var EMOJI_PATTERN = regexp.MustCompile(`:[a-zA-Z0-9_-]+:`)
 
 // ALL_EMOJI_PATTERN is same as the EMOJI_PATTERN except for allowing a '+' character.
@@ -40,6 +41,15 @@ func inSystemEmoji(emojiName string) bool {
 func GetSystemEmojiId(emojiName string) (string, bool) {
 	id, found := SystemEmojis[emojiName]
 	return id, found
+}
+
+func createReverseMapOfSystemEmoji() map[string]string {
+	newMap := make(map[string]string)
+	for key, value := range SystemEmojis {
+		newMap[value] = key
+	}
+
+	return newMap
 }
 
 func (emoji *Emoji) IsValid() *AppError {

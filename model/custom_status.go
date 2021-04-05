@@ -6,6 +6,7 @@ package model
 import (
 	"encoding/json"
 	"io"
+	"strconv"
 )
 
 const (
@@ -37,6 +38,14 @@ func CustomStatusFromJson(data io.Reader) *CustomStatus {
 	var cs *CustomStatus
 	_ = json.NewDecoder(data).Decode(&cs)
 	return cs
+}
+
+func RuneToStringAndUnicode(r rune) (code string, isUnicode bool) {
+	if r < 128 {
+		return string(r), false
+	} else {
+		return strconv.FormatInt(int64(r), 16), true
+	}
 }
 
 type RecentCustomStatuses []CustomStatus
