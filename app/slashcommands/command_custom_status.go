@@ -47,11 +47,6 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 	}
 
 	message = strings.TrimSpace(message)
-
-	if message == "" {
-		return &model.CommandResponse{Text: args.T("api.command_custom_status.message.app_error"), ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL}
-	}
-
 	if message == CmdCustomStatusClear {
 		if err := a.RemoveCustomStatus(args.UserId); err != nil {
 			mlog.Error(err.Error())
@@ -68,27 +63,30 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 		Emoji: DefaultCustomStatusEmoji,
 		Text:  message,
 	}
-	firstEmojiLocations := model.ALL_EMOJI_PATTERN.FindIndex([]byte(message))
-	if len(firstEmojiLocations) > 0 && firstEmojiLocations[0] == 0 {
-		// emoji found at starting index
-		customStatus.Emoji = message[firstEmojiLocations[0]+1 : firstEmojiLocations[1]-1]
-		customStatus.Text = strings.TrimSpace(message[firstEmojiLocations[1]:])
-	} else {
-		spaceSeparatedMessage := strings.Fields(message)
-		emojiString := spaceSeparatedMessage[0]
-		var unicode []string
-		for utf8.RuneCountInString(emojiString) >= 1 {
-			codepoint, size := utf8.DecodeRuneInString(emojiString)
-			code := model.RuneToHexadecimalString(codepoint)
-			unicode = append(unicode, code)
-			emojiString = emojiString[size:]
-		}
 
-		emoji, found := model.GetEmojiNameFromUnicode(strings.Join(unicode, "-"))
-		if found {
-			customStatus.Emoji = emoji
-			textString := strings.Join(spaceSeparatedMessage[1:], " ")
-			customStatus.Text = strings.TrimSpace(textString)
+	if message != "" {
+		firstEmojiLocations := model.ALL_EMOJI_PATTERN.FindIndex([]byte(message))
+		if len(firstEmojiLocations) > 0 && firstEmojiLocations[0] == 0 {
+			// emoji found at starting index
+			customStatus.Emoji = message[firstEmojiLocations[0]+1 : firstEmojiLocations[1]-1]
+			customStatus.Text = strings.TrimSpace(message[firstEmojiLocations[1]:])
+		} else {
+			spaceSeparatedMessage := strings.Fields(message)
+			emojiString := spaceSeparatedMessage[0]
+			var unicode []string
+			for utf8.RuneCountInString(emojiString) >= 1 {
+				codepoint, size := utf8.DecodeRuneInString(emojiString)
+				code := model.RuneToHexadecimalString(codepoint)
+				unicode = append(unicode, code)
+				emojiString = emojiString[size:]
+			}
+
+			emoji, found := model.GetEmojiNameFromUnicode(strings.Join(unicode, "-"))
+			if found {
+				customStatus.Emoji = emoji
+				textString := strings.Join(spaceSeparatedMessage[1:], " ")
+				customStatus.Text = strings.TrimSpace(textString)
+			}
 		}
 	}
 
