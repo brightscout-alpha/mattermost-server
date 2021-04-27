@@ -11,13 +11,15 @@ import (
 
 func TestGetCustomStatus(t *testing.T) {
 	for msg, expected := range map[string]model.CustomStatus{
-		"":              model.CustomStatus{Emoji: DefaultCustomStatusEmoji, Text: ""},
-		"hey":           model.CustomStatus{Emoji: DefaultCustomStatusEmoji, Text: "hey"},
-		":cactus: hurt": model.CustomStatus{Emoji: "cactus", Text: "hurt"},
-		"✋":             model.CustomStatus{Emoji: "raised_hand", Text: ""},
-		"✋ handsup":     model.CustomStatus{Emoji: "raised_hand", Text: "handsup"},
-		"👪 family":      model.CustomStatus{Emoji: "family", Text: "family"},
-		"👙 swimming":    model.CustomStatus{Emoji: "bikini", Text: "swimming"},
+		"":               model.CustomStatus{Emoji: DefaultCustomStatusEmoji, Text: ""},
+		"Hey":            model.CustomStatus{Emoji: DefaultCustomStatusEmoji, Text: "Hey"},
+		":cactus: Hurt":  model.CustomStatus{Emoji: "cactus", Text: "Hurt"},
+		"👅":              model.CustomStatus{Emoji: "tongue", Text: ""},
+		"👅 Eating":       model.CustomStatus{Emoji: "tongue", Text: "Eating"},
+		"💪🏻 Working out": model.CustomStatus{Emoji: "muscle_light_skin_tone", Text: "Working out"},
+		"👙 Swimming":     model.CustomStatus{Emoji: "bikini", Text: "Swimming"},
+		"👙Swimming":      model.CustomStatus{Emoji: DefaultCustomStatusEmoji, Text: "👙Swimming"},
+		"👍🏿 Okay":        model.CustomStatus{Emoji: "+1_dark_skin_tone", Text: "Okay"},
 	} {
 		actual := GetCustomStatus(msg)
 		if actual.Emoji != expected.Emoji || actual.Text != expected.Text {
