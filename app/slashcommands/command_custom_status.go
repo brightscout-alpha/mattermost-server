@@ -5,6 +5,7 @@ package slashcommands
 
 import (
 	"strings"
+	"time"
 
 	"github.com/mattermost/mattermost-server/v5/app"
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -19,7 +20,8 @@ const (
 	CmdCustomStatus      = app.CmdCustomStatusTrigger
 	CmdCustomStatusClear = "clear"
 
-	DefaultCustomStatusEmoji = "speech_balloon"
+	DefaultCustomStatusEmoji    = "speech_balloon"
+	DefaultCustomStatusDuration = "today"
 )
 
 func init() {
@@ -58,9 +60,12 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 		}
 	}
 
+	user, _ := a.GetUser(args.UserId)
 	customStatus := &model.CustomStatus{
-		Emoji: DefaultCustomStatusEmoji,
-		Text:  message,
+		Emoji:     DefaultCustomStatusEmoji,
+		Text:      message,
+		Duration:  DefaultCustomStatusDuration,
+		ExpiresAt: calculateExpiryTime(user.Timezone),
 	}
 	firstEmojiLocations := model.ALL_EMOJI_PATTERN.FindIndex([]byte(message))
 	if len(firstEmojiLocations) > 0 && firstEmojiLocations[0] == 0 {
@@ -82,4 +87,19 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 			"StatusMessage": customStatus.Text,
 		}),
 	}
+}
+
+func calculateExpiryTime(userTimezone model.StringMap) time.Time {
+
+	var timezone string
+	if userTimezone["useAutomaticTimezone"] == "true" {
+		timezone = userTimezone["automaticTimezone"]
+	} else {
+		timezone = userTimezone["manualTimezone"]
+	}
+
+	loc, _ := time.LoadLocation(timezone)
+	currentTime := time.Now().In(loc)
+
+	return time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 23, 59, 59, 0, loc)
 }
