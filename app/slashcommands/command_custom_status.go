@@ -60,12 +60,18 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 		}
 	}
 
-	user, _ := a.GetUser(args.UserId)
+	user, err := a.GetUser(args.UserId)
+	if err != nil {
+		mlog.Error(err.Error())
+		return &model.CommandResponse{Text: args.T("api.command_custom_status.app_error"), ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL}
+	}
+
+	timezoneEnabled := *a.Config().DisplaySettings.ExperimentalTimezone
 	customStatus := &model.CustomStatus{
 		Emoji:     DefaultCustomStatusEmoji,
 		Text:      message,
 		Duration:  DefaultCustomStatusDuration,
-		ExpiresAt: calculateExpiryTime(user.Timezone),
+		ExpiresAt: calculateExpiryTime(user.Timezone, timezoneEnabled),
 	}
 	firstEmojiLocations := model.ALL_EMOJI_PATTERN.FindIndex([]byte(message))
 	if len(firstEmojiLocations) > 0 && firstEmojiLocations[0] == 0 {
@@ -89,17 +95,21 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 	}
 }
 
-func calculateExpiryTime(userTimezone model.StringMap) time.Time {
+func calculateExpiryTime(userTimezone model.StringMap, timezoneEnabled bool) time.Time {
+	var currentTime time.Time
+	if timezoneEnabled {
+		var timezone string
+		if userTimezone["useAutomaticTimezone"] == "true" {
+			timezone = userTimezone["automaticTimezone"]
+		} else {
+			timezone = userTimezone["manualTimezone"]
+		}
 
-	var timezone string
-	if userTimezone["useAutomaticTimezone"] == "true" {
-		timezone = userTimezone["automaticTimezone"]
+		loc, _ := time.LoadLocation(timezone)
+		currentTime = time.Now().In(loc)
 	} else {
-		timezone = userTimezone["manualTimezone"]
+		currentTime = time.Now()
 	}
 
-	loc, _ := time.LoadLocation(timezone)
-	currentTime := time.Now().In(loc)
-
-	return time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 23, 59, 59, 0, loc)
+	return time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 23, 59, 59, 0, currentTime.Location())
 }
