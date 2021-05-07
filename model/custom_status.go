@@ -14,9 +14,10 @@ const (
 
 	CustomStatusTextMaxRunes = 100
 	MaxRecentCustomStatuses  = 5
+	DefaultCustomStatusEmoji = "speech_balloon"
 )
 
-var ValidCustomStatusDuration = map[string]bool{
+var validCustomStatusDuration = map[string]bool{
 	"dont_clear":     true,
 	"thirty_minutes": true,
 	"one_hour":       true,
@@ -40,6 +41,12 @@ func (cs *CustomStatus) TrimMessage() {
 	}
 }
 
+func (cs *CustomStatus) SetDefaultEmoji() {
+	if cs.Emoji == "" {
+		cs.Emoji = DefaultCustomStatusEmoji
+	}
+}
+
 func (cs *CustomStatus) ToJson() string {
 	csCopy := *cs
 	b, _ := json.Marshal(csCopy)
@@ -47,7 +54,7 @@ func (cs *CustomStatus) ToJson() string {
 }
 
 func (cs *CustomStatus) IsDurationValid() bool {
-	return ValidCustomStatusDuration[cs.Duration]
+	return validCustomStatusDuration[cs.Duration]
 }
 
 func (cs *CustomStatus) IsExpirationTimeValid() bool {

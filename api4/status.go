@@ -127,7 +127,7 @@ func updateUserCustomStatus(c *Context, w http.ResponseWriter, r *http.Request) 
 	}
 
 	customStatus := model.CustomStatusFromJson(r.Body)
-	if customStatus == nil || customStatus.Emoji == "" || !customStatus.IsDurationValid() || !customStatus.IsExpirationTimeValid() {
+	if customStatus == nil || !customStatus.IsDurationValid() || !customStatus.IsExpirationTimeValid() {
 		c.SetInvalidParam("custom_status")
 		return
 	}
@@ -137,6 +137,7 @@ func updateUserCustomStatus(c *Context, w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	customStatus.SetDefaultEmoji()
 	customStatus.TrimMessage()
 	err := c.App.SetCustomStatus(c.Params.UserId, customStatus)
 	if err != nil {

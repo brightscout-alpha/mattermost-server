@@ -71,7 +71,7 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 		Emoji:     DefaultCustomStatusEmoji,
 		Text:      message,
 		Duration:  DefaultCustomStatusDuration,
-		ExpiresAt: calculateExpiryTime(user.Timezone, timezoneEnabled),
+		ExpiresAt: calculateEndOfDay(user.Timezone, timezoneEnabled),
 	}
 	firstEmojiLocations := model.ALL_EMOJI_PATTERN.FindIndex([]byte(message))
 	if len(firstEmojiLocations) > 0 && firstEmojiLocations[0] == 0 {
@@ -95,7 +95,7 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 	}
 }
 
-func calculateExpiryTime(userTimezone model.StringMap, timezoneEnabled bool) time.Time {
+func calculateEndOfDay(userTimezone model.StringMap, timezoneEnabled bool) time.Time {
 	var currentTime time.Time
 	if timezoneEnabled {
 		var timezone string
