@@ -18,8 +18,6 @@ type CustomStatusProvider struct {
 const (
 	CmdCustomStatus      = app.CmdCustomStatusTrigger
 	CmdCustomStatusClear = "clear"
-
-	DefaultCustomStatusEmoji = "speech_balloon"
 )
 
 func init() {
@@ -59,7 +57,7 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 	}
 
 	customStatus := &model.CustomStatus{
-		Emoji:    DefaultCustomStatusEmoji,
+		Emoji:    model.DefaultCustomStatusEmoji,
 		Text:     message,
 		Duration: model.DefaultCustomStatusDuration,
 	}
