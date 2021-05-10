@@ -12,9 +12,10 @@ import (
 const (
 	UserPropsKeyCustomStatus = "customStatus"
 
-	CustomStatusTextMaxRunes = 100
-	MaxRecentCustomStatuses  = 5
-	DefaultCustomStatusEmoji = "speech_balloon"
+	CustomStatusTextMaxRunes    = 100
+	MaxRecentCustomStatuses     = 5
+	DefaultCustomStatusEmoji    = "speech_balloon"
+	DefaultCustomStatusDuration = "dont_clear"
 )
 
 var validCustomStatusDuration = map[string]bool{
@@ -41,9 +42,13 @@ func (cs *CustomStatus) TrimMessage() {
 	}
 }
 
-func (cs *CustomStatus) SetDefaultEmoji() {
+func (cs *CustomStatus) SetDefaults() {
 	if cs.Emoji == "" {
 		cs.Emoji = DefaultCustomStatusEmoji
+	}
+
+	if cs.Duration == "" {
+		cs.Duration = DefaultCustomStatusDuration
 	}
 }
 
@@ -54,11 +59,11 @@ func (cs *CustomStatus) ToJson() string {
 }
 
 func (cs *CustomStatus) IsDurationValid() bool {
-	return validCustomStatusDuration[cs.Duration]
+	return cs.Duration == "" || validCustomStatusDuration[cs.Duration]
 }
 
 func (cs *CustomStatus) IsExpirationTimeValid() bool {
-	return !(cs.Duration != "dont_clear" && (cs.ExpiresAt.IsZero() || cs.ExpiresAt.Before(time.Now())))
+	return !(cs.Duration != "" && cs.Duration != "dont_clear" && (cs.ExpiresAt.IsZero() || cs.ExpiresAt.Before(time.Now())))
 }
 
 func CustomStatusFromJson(data io.Reader) *CustomStatus {
