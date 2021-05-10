@@ -5,7 +5,6 @@ package slashcommands
 
 import (
 	"strings"
-	"time"
 
 	"github.com/mattermost/mattermost-server/v5/app"
 	"github.com/mattermost/mattermost-server/v5/model"
@@ -61,10 +60,9 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 	}
 
 	customStatus := &model.CustomStatus{
-		Emoji:     DefaultCustomStatusEmoji,
-		Text:      message,
-		Duration:  DefaultCustomStatusDuration,
-		ExpiresAt: time.Now(),
+		Emoji:    DefaultCustomStatusEmoji,
+		Text:     message,
+		Duration: DefaultCustomStatusDuration,
 	}
 	firstEmojiLocations := model.ALL_EMOJI_PATTERN.FindIndex([]byte(message))
 	if len(firstEmojiLocations) > 0 && firstEmojiLocations[0] == 0 {
