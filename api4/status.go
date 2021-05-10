@@ -137,8 +137,7 @@ func updateUserCustomStatus(c *Context, w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	customStatus.SetDefaults()
-	customStatus.TrimMessage()
+	customStatus.PreSave()
 	err := c.App.SetCustomStatus(c.Params.UserId, customStatus)
 	if err != nil {
 		c.Err = err

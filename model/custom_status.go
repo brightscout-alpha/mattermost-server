@@ -35,20 +35,18 @@ type CustomStatus struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
-func (cs *CustomStatus) TrimMessage() {
-	runes := []rune(cs.Text)
-	if len(runes) > CustomStatusTextMaxRunes {
-		cs.Text = string(runes[:CustomStatusTextMaxRunes])
-	}
-}
-
-func (cs *CustomStatus) SetDefaults() {
+func (cs *CustomStatus) PreSave() {
 	if cs.Emoji == "" {
 		cs.Emoji = DefaultCustomStatusEmoji
 	}
 
 	if cs.Duration == "" {
 		cs.Duration = DefaultCustomStatusDuration
+	}
+
+	runes := []rune(cs.Text)
+	if len(runes) > CustomStatusTextMaxRunes {
+		cs.Text = string(runes[:CustomStatusTextMaxRunes])
 	}
 }
 
@@ -63,7 +61,9 @@ func (cs *CustomStatus) IsDurationValid() bool {
 }
 
 func (cs *CustomStatus) IsExpirationTimeValid() bool {
-	return !(cs.Duration != "" && cs.Duration != "dont_clear" && (cs.ExpiresAt.IsZero() || cs.ExpiresAt.Before(time.Now())))
+	isStatusDurationEmpty := cs.Duration == "" || cs.Duration == "dont_clear"
+	isStatusAlreadyExpired := cs.ExpiresAt.IsZero() || cs.ExpiresAt.Before(time.Now())
+	return isStatusDurationEmpty || !isStatusAlreadyExpired
 }
 
 func CustomStatusFromJson(data io.Reader) *CustomStatus {

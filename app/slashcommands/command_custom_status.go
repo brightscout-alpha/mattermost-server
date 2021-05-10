@@ -19,8 +19,7 @@ const (
 	CmdCustomStatus      = app.CmdCustomStatusTrigger
 	CmdCustomStatusClear = "clear"
 
-	DefaultCustomStatusEmoji    = "speech_balloon"
-	DefaultCustomStatusDuration = "dont_clear"
+	DefaultCustomStatusEmoji = "speech_balloon"
 )
 
 func init() {
@@ -62,7 +61,7 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 	customStatus := &model.CustomStatus{
 		Emoji:    DefaultCustomStatusEmoji,
 		Text:     message,
-		Duration: DefaultCustomStatusDuration,
+		Duration: model.DefaultCustomStatusDuration,
 	}
 	firstEmojiLocations := model.ALL_EMOJI_PATTERN.FindIndex([]byte(message))
 	if len(firstEmojiLocations) > 0 && firstEmojiLocations[0] == 0 {
@@ -71,7 +70,7 @@ func (*CustomStatusProvider) DoCommand(a *app.App, args *model.CommandArgs, mess
 		customStatus.Text = strings.TrimSpace(message[firstEmojiLocations[1]:])
 	}
 
-	customStatus.TrimMessage()
+	customStatus.PreSave()
 	if err := a.SetCustomStatus(args.UserId, customStatus); err != nil {
 		mlog.Error(err.Error())
 		return &model.CommandResponse{Text: args.T("api.command_custom_status.app_error"), ResponseType: model.COMMAND_RESPONSE_TYPE_EPHEMERAL}
